@@ -1,5 +1,6 @@
 package com.djdch.dev.serialtoarduinoled;
 
+import com.djdch.dev.serialtoarduinoled.serial.SerialUtil;
 import com.djdch.dev.serialtoarduinoled.swing.ApplicationFrame;
 
 public class SerialToArduinoLED {

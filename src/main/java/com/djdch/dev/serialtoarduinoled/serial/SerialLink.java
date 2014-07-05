@@ -21,33 +21,27 @@ public class SerialLink {
         buffer = new ByteArrayOutputStream();
     }
 
-    public void connect() {
+    public void connect() throws SerialPortException {
         if (portName == null) {
             throw new IllegalArgumentException("PortName is null.");
         }
 
         serialPort = new SerialPort(portName);
-        try {
-            serialPort.openPort();
-            serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-//            serialPort.writeBytes(new byte[] {-128, 0, 0});
+        serialPort.openPort();
+        serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+//        serialPort.writeBytes(new byte[] {-128, 0, 0});
 
-            connected = true;
-        } catch (SerialPortException e) {
-            e.printStackTrace();
-            disconnect();
-        }
+        connected = true;
     }
 
-    public void disconnect() {
-        if (serialPort != null) {
+    public void disconnect() throws SerialPortException {
+        if (serialPort != null && connected) {
             try {
                 serialPort.writeBytes(new byte[] {0, 0, 0});
                 serialPort.closePort();
-
+            } finally {
+                serialPort = null;
                 connected = false;
-            } catch (SerialPortException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -56,13 +50,9 @@ public class SerialLink {
         buffer.write(val);
     }
 
-    public void flush() {
-        try {
+    public void flush() throws SerialPortException {
             serialPort.writeBytes(buffer.toByteArray());
             buffer.reset();
-        } catch (SerialPortException e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean isConnected() {

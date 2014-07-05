@@ -26,6 +26,8 @@ import com.djdch.dev.serialtoarduinoled.listener.TextFieldDocumentListener;
 import com.djdch.dev.serialtoarduinoled.serial.SerialLink;
 import com.djdch.dev.serialtoarduinoled.serial.SerialUtil;
 
+import jssc.SerialPortException;
+
 public class ApplicationFrame extends JFrame {
 
     public static final String APPLICATION_NAME = "SoundStreamVisualizer";
@@ -51,7 +53,11 @@ public class ApplicationFrame extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (serial.isConnected()) {
-                    serial.disconnect();
+                    try {
+                        serial.disconnect();
+                    } catch (SerialPortException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
             @Override
@@ -86,10 +92,14 @@ public class ApplicationFrame extends JFrame {
     public void update() {
         box.setColor(new Color(rSlider.getValue(), gSlider.getValue(), bSlider.getValue()));
 
-        serial.write(rSlider.getValue());
-        serial.write(gSlider.getValue());
-        serial.write(bSlider.getValue());
-        serial.flush();
+        try {
+            serial.write(rSlider.getValue());
+            serial.write(gSlider.getValue());
+            serial.write(bSlider.getValue());
+            serial.flush();
+        } catch (SerialPortException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initMenu() {
@@ -108,9 +118,12 @@ public class ApplicationFrame extends JFrame {
                 connectItem.setEnabled(false);
                 disconnectItem.setEnabled(true);
 
-                serial.setPortName(currentItemPort.getText());
-                serial.connect();
-
+                try {
+                    serial.setPortName(currentItemPort.getText());
+                    serial.connect();
+                } catch (SerialPortException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
@@ -133,7 +146,11 @@ public class ApplicationFrame extends JFrame {
                 gSlider.setValue(0);
                 bSlider.setValue(0);
 
-                serial.disconnect();
+                try {
+                    serial.disconnect();
+                } catch (SerialPortException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
